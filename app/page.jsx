@@ -55,19 +55,22 @@ const toRoman = (num) => {
 // --- 2. 样式注入 ---
 const GlobalStyles = () => (
   <style jsx global>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&display=swap');
     
+    /* 使用 Noto Serif SC 优化中文显示，Cinzel 用于英文装饰 */
     .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-serif-cn { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; }
     .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+    
     .perspective-1000 { perspective: 1000px; }
     .backface-hidden { backface-visibility: hidden; }
     .transform-style-3d { transform-style: preserve-3d; }
     
-    /* 隐藏滚动条但保留功能 */
+    /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* 解读面板专用滚动条 */
+    /* 美化滚动条 */
     .styled-scrollbar::-webkit-scrollbar { width: 4px; }
     .styled-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
     .styled-scrollbar::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.3); border-radius: 10px; }
@@ -90,7 +93,7 @@ const GlobalStyles = () => (
   `}</style>
 );
 
-// --- 修复版 Markdown 渲染器 ---
+// --- 3. Markdown 渲染器 ---
 const MarkdownRenderer = ({ content }) => {
   if (!content) return null;
   const cleanContent = content.replace(/^```markdown\s*/g, '').replace(/^```\s*/g, '').replace(/```$/g, '').trim();
@@ -102,14 +105,14 @@ const MarkdownRenderer = ({ content }) => {
         const trimmed = line.trim();
         if (!trimmed) return <div key={index} className="h-2"></div>;
 
-        if (trimmed.startsWith('###')) return <h3 key={index} className="text-lg font-cinzel font-bold text-amber-500 mt-6 mb-2 pb-2 border-b border-amber-500/20 tracking-widest uppercase">{trimmed.replace(/^###\s+/, '')}</h3>;
-        if (trimmed.startsWith('##')) return <h2 key={index} className="text-xl md:text-2xl font-cinzel text-amber-200 mt-8 mb-4 flex items-center gap-3 tracking-widest"><span className="text-amber-600 text-sm">✦</span> {trimmed.replace(/^##\s+/, '')}</h2>;
-        if (trimmed.startsWith('#')) return <h1 key={index} className="text-2xl md:text-3xl font-cinzel font-bold text-amber-100 mt-8 mb-6 text-center border-b-2 border-amber-900/20 pb-4">{trimmed.replace(/^#\s+/, '')}</h1>;
+        if (trimmed.startsWith('###')) return <h3 key={index} className="text-lg font-serif-cn font-bold text-amber-500 mt-6 mb-2 pb-2 border-b border-amber-500/20 tracking-wider">{trimmed.replace(/^###\s+/, '')}</h3>;
+        if (trimmed.startsWith('##')) return <h2 key={index} className="text-xl md:text-2xl font-serif-cn font-bold text-amber-200 mt-8 mb-4 flex items-center gap-3 tracking-widest"><span className="text-amber-600 text-sm">✦</span> {trimmed.replace(/^##\s+/, '')}</h2>;
+        if (trimmed.startsWith('#')) return <h1 key={index} className="text-2xl md:text-3xl font-serif-cn font-bold text-amber-100 mt-8 mb-6 text-center border-b-2 border-amber-900/20 pb-4">{trimmed.replace(/^#\s+/, '')}</h1>;
         
         if (trimmed.match(/^[-*]\s/)) {
             return (
                 <div key={index} className="flex gap-3 ml-1 pl-4 border-l border-amber-500/20 hover:border-amber-500/50 transition-colors py-1">
-                    <p className="font-cormorant text-lg md:text-xl leading-relaxed text-slate-300" dangerouslySetInnerHTML={{ __html: parseBold(trimmed.replace(/^[-*]\s/, '')) }}></p>
+                    <p className="font-serif-cn text-lg md:text-xl leading-relaxed text-slate-300" dangerouslySetInnerHTML={{ __html: parseBold(trimmed.replace(/^[-*]\s/, '')) }}></p>
                 </div>
             );
         }
@@ -119,7 +122,7 @@ const MarkdownRenderer = ({ content }) => {
                 <div key={index} className="my-4 p-4 bg-amber-500/5 border-l-2 border-amber-500 rounded-r-lg">
                     <div className="flex items-start gap-3">
                         <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-1" />
-                        <p className="font-cormorant text-lg md:text-xl italic text-amber-100/90 leading-relaxed">
+                        <p className="font-serif-cn text-lg md:text-xl italic text-amber-100/90 leading-relaxed">
                             {trimmed.replace(/^>\s*/, '')}
                         </p>
                     </div>
@@ -127,14 +130,15 @@ const MarkdownRenderer = ({ content }) => {
             );
         }
 
-        return <p key={index} className="font-cormorant text-lg md:text-xl leading-8 text-slate-300/90 tracking-wide" dangerouslySetInnerHTML={{ __html: parseBold(line) }}></p>;
+        return <p key={index} className="font-serif-cn text-lg md:text-xl leading-8 text-slate-300/90 tracking-wide" dangerouslySetInnerHTML={{ __html: parseBold(line) }}></p>;
       })}
     </div>
   );
 };
-const parseBold = (text) => text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-200 font-semibold">$1</strong>');
+const parseBold = (text) => text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-200 font-bold">$1</strong>');
 
-// --- 3. 符号风格 ---
+// --- 4. 核心符号风格 (Royal Alchemy) ---
+// 只保留这一个风格
 const AlchemySymbol = ({ Icon, id }) => (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at center, #451a03 0%, #1a1008 50%, transparent 80%)' }}></div>
@@ -162,20 +166,8 @@ const AlchemySymbol = ({ Icon, id }) => (
     </div>
 );
 
-const NebulaSymbol = ({ Icon }) => <div className="flex items-center justify-center h-full text-white"><Icon size={36} className="md:w-12 md:h-12" /></div>;
-const GlitchSymbol = ({ Icon }) => <div className="flex items-center justify-center h-full text-cyan-400"><Icon size={36} className="md:w-12 md:h-12" /></div>;
-
-const SymbolRenderer = ({ id, style }) => {
-    const Icon = ICON_MAP[id] || Sparkles;
-    switch (style) {
-        case 'nebula': return <NebulaSymbol Icon={Icon} id={id} />;
-        case 'glitch': return <GlitchSymbol Icon={Icon} id={id} />;
-        case 'alchemy': default: return <AlchemySymbol Icon={Icon} id={id} />;
-    }
-};
-
-// --- 4. 卡牌组件 ---
-const TarotCard = React.memo(({ card, isRevealed, onClick, positionLabel, size = "md", className = "", interactable = false, artStyle = 'alchemy' }) => {
+// --- 5. 卡牌组件 ---
+const TarotCard = React.memo(({ card, isRevealed, onClick, positionLabel, size = "md", className = "", interactable = false }) => {
   const [visualFlip, setVisualFlip] = useState(false);
 
   useEffect(() => {
@@ -184,10 +176,16 @@ const TarotCard = React.memo(({ card, isRevealed, onClick, positionLabel, size =
   }, [isRevealed]);
 
   const sizeClasses = {
-    sm: "w-16 h-24 md:w-20 md:h-32", // 移动端更小
+    sm: "w-16 h-24 md:w-20 md:h-32", 
     md: "w-24 h-40 md:w-32 md:h-52", 
     lg: "w-32 h-52 md:w-48 md:h-80",
     full: "w-full h-full"
+  };
+
+  // 处理卡牌名称，优先显示中文
+  const getCardName = (nameStr) => {
+      if (!nameStr) return "";
+      return nameStr.split('(')[0].trim(); // "愚者 (The Fool)" -> "愚者"
   };
 
   return (
@@ -205,12 +203,14 @@ const TarotCard = React.memo(({ card, isRevealed, onClick, positionLabel, size =
         {/* 牌面 */}
         <div className="absolute inset-0 w-full h-full rounded-lg bg-[#08080a] border border-amber-500/20 shadow-2xl overflow-hidden backface-hidden flex flex-col" style={{ transform: 'rotateY(180deg)' }}>
            <div className="flex-1 relative w-full h-full">
-              <SymbolRenderer id={card?.id} style={artStyle} />
+              <AlchemySymbol Icon={ICON_MAP[card?.id] || Sparkles} id={card?.id} />
            </div>
            <div className="h-8 md:h-11 bg-gradient-to-t from-[#050302] via-[#0a0806] to-transparent absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-1 md:pb-1.5 z-20">
-             <div className="text-amber-100 font-cinzel text-[9px] md:text-[10px] font-bold tracking-widest drop-shadow-md px-1 text-center truncate w-full">{card?.nameEn}</div>
-             <div className={`text-[7px] md:text-[8px] uppercase font-mono tracking-widest mt-0.5 px-1.5 py-[1px] rounded-full bg-black/40 ${card?.isReversed ? 'text-red-400/80' : 'text-emerald-400/80'}`}>
-               {card?.isReversed ? "Rev." : "Upr."}
+             <div className="text-amber-100 font-serif-cn font-bold text-[10px] md:text-xs tracking-widest drop-shadow-md px-1 text-center truncate w-full">
+                 {getCardName(card?.name)}
+             </div>
+             <div className={`text-[9px] md:text-[10px] font-serif-cn font-bold mt-0.5 px-2 py-[1px] rounded-full bg-black/40 ${card?.isReversed ? 'text-red-400/90' : 'text-emerald-400/90'}`}>
+               {card?.isReversed ? "逆位" : "正位"}
              </div>
            </div>
         </div>
@@ -219,7 +219,7 @@ const TarotCard = React.memo(({ card, isRevealed, onClick, positionLabel, size =
   );
 });
 
-// --- 5. 主程序 ---
+// --- 6. 主程序 ---
 export default function TarotApp() {
   const [step, setStep] = useState('intro'); 
   const [question, setQuestion] = useState('');
@@ -229,7 +229,6 @@ export default function TarotApp() {
   const [analysis, setAnalysis] = useState('');
   const [isAnalysing, setIsAnalysing] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [artStyle, setArtStyle] = useState('alchemy'); 
   const analysisScrollRef = useRef(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -258,7 +257,7 @@ export default function TarotApp() {
     setIsAnalysing(true);
     setAnalysis(''); 
     try {
-      const enhancedQuestion = `${question} (请用直白、通俗易懂的语言进行解读，直接给出明确的行动建议，避免使用过于晦涩或模棱两可的词汇。)`;
+      const enhancedQuestion = `${question} (请用直白、通俗易懂的中文语言进行解读，直接给出明确的行动建议，避免使用过于晦涩或模棱两可的词汇。请分段落解读过去、现在和未来的含义。)`;
       const response = await fetch('/api/tarot', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -296,6 +295,9 @@ export default function TarotApp() {
 
   if (!mounted) return null;
 
+  // 牌阵位置名称中文映射
+  const POSITIONS = ['过去', '现在', '未来'];
+
   return (
     <div className="min-h-screen bg-[#050508] text-slate-200 font-sans overflow-hidden flex flex-col relative selection:bg-amber-900/50 selection:text-amber-100">
       <GlobalStyles />
@@ -304,47 +306,46 @@ export default function TarotApp() {
          <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] bg-amber-900/5 blur-[150px] opacity-40 animate-pulse"></div>
       </div>
 
+      {/* 头部 - 汉化版 */}
       <header className="relative z-50 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/5 bg-[#050508]/80 backdrop-blur-md h-[60px] md:h-[70px] flex-none">
         <div onClick={reset} className="flex items-center gap-2 md:gap-3 cursor-pointer hover:opacity-80 transition-opacity">
           <Sparkles className="text-amber-500 w-4 h-4 md:w-5 md:h-5" />
-          <span className="font-cinzel font-bold text-base md:text-lg tracking-widest text-amber-100">DEEP TAROT</span>
+          <span className="font-serif-cn font-bold text-base md:text-lg tracking-widest text-amber-100">深度塔罗</span>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
-            <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/10 overflow-x-auto max-w-[180px] md:max-w-none no-scrollbar">
-                <button onClick={() => setArtStyle('alchemy')} className={`flex-shrink-0 px-2 md:px-3 py-1 text-[9px] md:text-[10px] font-mono rounded-full transition-all ${artStyle === 'alchemy' ? 'bg-amber-700 text-amber-100 shadow-lg' : 'text-slate-500 hover:text-white'}`}>ALCHEMY</button>
-                <button onClick={() => setArtStyle('nebula')} className={`flex-shrink-0 px-2 md:px-3 py-1 text-[9px] md:text-[10px] font-mono rounded-full transition-all ${artStyle === 'nebula' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:text-white'}`}>NEBULA</button>
-                <button onClick={() => setArtStyle('glitch')} className={`flex-shrink-0 px-2 md:px-3 py-1 text-[9px] md:text-[10px] font-mono rounded-full transition-all ${artStyle === 'glitch' ? 'bg-pink-600 text-white' : 'text-slate-500 hover:text-white'}`}>GLITCH</button>
-            </div>
             {step !== 'intro' && (
                 <button onClick={backToQuestion} className="flex-shrink-0 flex items-center gap-2 text-xs text-slate-400 hover:text-white transition-colors border border-white/10 hover:border-white/30 px-3 py-1.5 md:px-4 rounded-full">
                     <ArrowLeft size={14} />
+                    <span className="hidden md:inline">重新提问</span>
                 </button>
             )}
         </div>
       </header>
 
-      {/* 核心容器：适配 100dvh */}
+      {/* 主体内容 */}
       <main className="flex-1 relative z-10 flex flex-col max-w-7xl mx-auto w-full h-[calc(100dvh-60px)] md:h-[calc(100dvh-70px)] overflow-hidden">
         
+        {/* 1. 提问阶段 */}
         {step === 'intro' && (
           <div className="flex-1 flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-700 overflow-y-auto">
              <div className="text-center space-y-6 md:space-y-8 max-w-2xl w-full">
-                <h1 className="text-3xl md:text-6xl font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200/80 to-slate-600 drop-shadow-2xl py-2">向 命 运 提 问</h1>
+                <h1 className="text-3xl md:text-6xl font-serif-cn text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200/80 to-slate-600 drop-shadow-2xl py-2 font-bold">向 命 运 提 问</h1>
                 <div className="h-32 w-20 md:h-40 md:w-24 mx-auto perspective-1000">
                     <div className="relative w-full h-full animate-[float_5s_ease-in-out_infinite]">
-                        <TarotCard card={MAJOR_ARCANA[10]} isRevealed={true} size="full" artStyle={artStyle} />
+                        <TarotCard card={MAJOR_ARCANA[10]} isRevealed={true} size="full" />
                     </div>
                 </div>
                 <div className="relative group">
                    <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/20 to-purple-600/20 rounded-xl blur transition duration-1000"></div>
-                   <textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder="在心中默念你的问题..." className="relative w-full bg-[#0e0e12] p-6 md:p-8 rounded-xl border border-white/10 focus:border-amber-500/30 outline-none resize-none h-32 md:h-40 text-lg md:text-xl font-cormorant text-center placeholder:text-slate-700 placeholder:italic transition-all shadow-xl" />
+                   <textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder="在心中默念你的困惑..." className="relative w-full bg-[#0e0e12] p-6 md:p-8 rounded-xl border border-white/10 focus:border-amber-500/30 outline-none resize-none h-32 md:h-40 text-lg md:text-xl font-serif-cn text-center placeholder:text-slate-700 placeholder:italic transition-all shadow-xl" />
                 </div>
-                <button onClick={startProcess} disabled={!question.trim()} className="px-12 md:px-16 py-3 md:py-4 bg-gradient-to-r from-amber-800 to-amber-700 hover:from-amber-700 hover:to-amber-600 text-white font-cinzel font-bold tracking-[0.2em] rounded shadow-[0_0_40px_rgba(180,83,9,0.3)] transition-all disabled:opacity-30 text-sm md:text-base">启 示</button>
+                <button onClick={startProcess} disabled={!question.trim()} className="px-12 md:px-16 py-3 md:py-4 bg-gradient-to-r from-amber-800 to-amber-700 hover:from-amber-700 hover:to-amber-600 text-white font-serif-cn font-bold tracking-[0.2em] rounded shadow-[0_0_40px_rgba(180,83,9,0.3)] transition-all disabled:opacity-30 text-sm md:text-base">启 示</button>
              </div>
              <style jsx>{`@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }`}</style>
           </div>
         )}
 
+        {/* 2. 洗牌阶段 */}
         {step === 'shuffling' && (
           <div className="flex-1 flex flex-col items-center justify-center gap-8 md:gap-12 animate-in fade-in duration-1000">
              <div className="relative w-24 h-36 md:w-32 md:h-48 perspective-1000">
@@ -353,17 +354,18 @@ export default function TarotApp() {
                 ))}
                 <style jsx>{`@keyframes shuffle { 0% { transform: translate(0,0) rotate(0); } 50% { transform: translate(30px, 0) rotate(12deg); } 100% { transform: translate(0,0) rotate(0); } }`}</style>
              </div>
-             <p className="font-cinzel text-amber-200/50 tracking-[0.3em] animate-pulse">DIVINING...</p>
+             <p className="font-serif-cn text-amber-200/50 tracking-[0.2em] animate-pulse text-lg">连结宇宙意识...</p>
           </div>
         )}
 
+        {/* 3. 抽牌阶段 */}
         {step === 'drawing' && (
           <div className="flex-1 flex flex-col h-full animate-in fade-in duration-700">
              <div className="flex-none py-4 md:py-8 text-center z-20 space-y-1 md:space-y-2">
-                <h2 className="text-xl md:text-2xl font-cinzel text-amber-100">选择 <span className="text-amber-500 text-2xl md:text-3xl mx-2">{3 - selectedIndices.length}</span> 张牌</h2>
+                <h2 className="text-xl md:text-2xl font-serif-cn text-amber-100">请选择 <span className="text-amber-500 text-2xl md:text-3xl mx-2">{3 - selectedIndices.length}</span> 张牌</h2>
              </div>
              
-             {/* 抽牌区：优化移动端显示 */}
+             {/* 抽牌区 */}
              <div className="flex-1 w-full flex flex-col justify-center relative group">
                 <div className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 text-white/10 animate-pulse"><ArrowLeft size={20}/></div>
                 <div className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 text-white/10 animate-pulse"><MoveRight size={20}/></div>
@@ -383,64 +385,64 @@ export default function TarotApp() {
                 </div>
              </div>
 
-             {/* 底部结果槽：缩小尺寸以适配小屏 */}
+             {/* 底部结果槽 */}
              <div className="flex-none h-48 md:h-56 bg-gradient-to-t from-black via-[#0a0a0e] to-transparent flex items-center justify-center gap-3 md:gap-16 pb-6 md:pb-8 px-2 z-20">
-                {['过去', '现在', '未来'].map((pos, idx) => (
+                {POSITIONS.map((pos, idx) => (
                    <div key={idx} className="flex flex-col items-center gap-2 md:gap-3">
                       <div className={`relative w-20 h-32 md:w-28 md:h-48 rounded-lg border-2 border-dashed border-white/5 flex items-center justify-center transition-all duration-700 ${drawnCards[idx] ? 'border-none shadow-[0_0_60px_rgba(217,119,6,0.25)]' : 'bg-white/5'}`}>
-                         {drawnCards[idx] ? <TarotCard card={drawnCards[idx]} isRevealed={true} size="full" className="w-full h-full" artStyle={artStyle} /> : <span className="text-xl md:text-2xl font-cinzel text-white/5">{idx + 1}</span>}
+                         {drawnCards[idx] ? <TarotCard card={drawnCards[idx]} isRevealed={true} size="full" /> : <span className="text-xl md:text-2xl font-cinzel text-white/5">{idx + 1}</span>}
                       </div>
-                      <span className="text-[9px] md:text-[10px] font-mono uppercase tracking-widest text-slate-600">{pos}</span>
+                      <span className="text-[11px] md:text-xs font-serif-cn font-bold tracking-widest text-slate-500">{pos}</span>
                    </div>
                 ))}
              </div>
           </div>
         )}
 
+        {/* 4. 解读阶段 */}
         {step === 'reading' && (
            <div className="flex-1 flex flex-col lg:flex-row gap-4 md:gap-6 p-3 md:p-6 h-full overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-700">
               
-              {/* 左侧：牌阵 (移动端缩小高度，横向滚动) */}
+              {/* 左侧：牌阵 */}
               <div className="flex-none lg:w-[320px] flex flex-col gap-4 max-h-[160px] lg:max-h-full">
                  <div className="glass-panel rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col gap-2 md:gap-4 h-full">
-                    <div className="text-[10px] md:text-xs text-amber-500/60 font-mono uppercase tracking-widest border-b border-white/5 pb-2 flex-none">Your Spread</div>
+                    <div className="text-[10px] md:text-xs text-amber-500/60 font-serif-cn font-bold uppercase tracking-widest border-b border-white/5 pb-2 flex-none">牌阵概览</div>
                     <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto lg:overflow-x-hidden pb-2 lg:pb-0 styled-scrollbar flex-1 items-center lg:items-stretch">
                         {drawnCards.map((card, i) => (
                            <div key={i} className="flex-shrink-0 flex flex-col lg:flex-row items-center gap-2 md:gap-4 p-2 md:p-3 rounded-lg bg-white/5 border border-white/5 w-20 lg:w-full">
-                              <TarotCard card={card} isRevealed={true} size="sm" className="w-12 h-20 md:w-16 md:h-24 shadow-md flex-shrink-0" artStyle={artStyle} />
+                              <TarotCard card={card} isRevealed={true} size="sm" className="w-12 h-20 md:w-16 md:h-24 shadow-md flex-shrink-0" />
                               <div className="flex flex-col min-w-0 text-center lg:text-left hidden lg:block">
-                                  <div className="text-[10px] text-amber-500 uppercase tracking-wider mb-0.5">{['Past', 'Present', 'Future'][i]}</div>
-                                  <div className="text-sm font-cinzel text-slate-200 truncate">{card.nameEn}</div>
+                                  <div className="text-[10px] text-amber-500 uppercase tracking-wider mb-0.5">{POSITIONS[i]}</div>
+                                  <div className="text-sm font-serif-cn font-bold text-slate-200 truncate">{card.name.split('(')[0]}</div>
                               </div>
                            </div>
                         ))}
                     </div>
                     
-                    {/* 仅在桌面端显示的左侧按钮 (移动端放下面) */}
                     {!analysis && !isAnalysing && (
                         <div className="hidden lg:block mt-auto pt-4 flex-none">
-                            <button onClick={startAnalysis} className="w-full py-4 bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"><Sparkles size={18} /> 揭示命运</button>
+                            <button onClick={startAnalysis} className="w-full py-4 bg-amber-700 hover:bg-amber-600 text-white font-serif-cn font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"><Sparkles size={18} /> 揭示命运</button>
                         </div>
                     )}
                  </div>
               </div>
               
-              {/* 移动端专属：揭示按钮 (为了不占据上方牌阵空间) */}
+              {/* 移动端专属：揭示按钮 */}
               {!analysis && !isAnalysing && (
                  <div className="lg:hidden flex-none">
-                     <button onClick={startAnalysis} className="w-full py-3 bg-amber-700 hover:bg-amber-600 text-white font-cinzel font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"><Sparkles size={18} /> 揭示命运</button>
+                     <button onClick={startAnalysis} className="w-full py-3 bg-amber-700 hover:bg-amber-600 text-white font-serif-cn font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"><Sparkles size={18} /> 揭示命运</button>
                  </div>
               )}
 
               {/* 右侧：解读面板 */}
               <div className="flex-1 glass-panel rounded-xl md:rounded-2xl flex flex-col overflow-hidden relative h-full">
                  <div className="flex-none h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-white/5">
-                    <span className="font-cinzel font-bold text-sm md:text-base text-amber-100 tracking-wider flex items-center gap-2 md:gap-3">{isAnalysing ? <RefreshCw className="animate-spin w-4 h-4 text-amber-500" /> : <BookOpen className="w-4 h-4 text-amber-500" />} ORACLE READING</span>
+                    <span className="font-serif-cn font-bold text-sm md:text-base text-amber-100 tracking-wider flex items-center gap-2 md:gap-3">{isAnalysing ? <RefreshCw className="animate-spin w-4 h-4 text-amber-500" /> : <BookOpen className="w-4 h-4 text-amber-500" />} 命运指引</span>
                     {analysis && <button onClick={reset} className="text-[10px] md:text-xs text-slate-500 hover:text-white flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-white/5 hover:border-white/20 transition-all"><X size={14} /> 结束</button>}
                  </div>
                  
                  <div ref={analysisScrollRef} className="flex-1 overflow-y-auto styled-scrollbar p-4 md:p-12 relative scroll-smooth">
-                    {analysis ? <MarkdownRenderer content={analysis} /> : <div className="h-full flex flex-col items-center justify-center text-slate-700/50 gap-4 md:gap-6"><div className="relative"><div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full"></div><Eye size={48} strokeWidth={1} className="relative z-10" /></div><p className="font-cinzel text-xs md:text-sm tracking-[0.2em]">Waiting to Reveal</p></div>}
+                    {analysis ? <MarkdownRenderer content={analysis} /> : <div className="h-full flex flex-col items-center justify-center text-slate-700/50 gap-4 md:gap-6"><div className="relative"><div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full"></div><Eye size={48} strokeWidth={1} className="relative z-10" /></div><p className="font-serif-cn text-xs md:text-sm tracking-[0.2em]">等待启示...</p></div>}
                  </div>
               </div>
            </div>
